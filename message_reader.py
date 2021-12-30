@@ -18,6 +18,7 @@ async def chat_client(args):
                 async with aiofiles.open(path, 'a') as f:
                     await f.write(f"[{datetime.datetime.now().strftime('%d.%m.%y %H:%M')}] {data.decode()}")
             except UnicodeDecodeError:
+                logging.info(f'Failed to decode message: {data}')
                 continue
 
 
