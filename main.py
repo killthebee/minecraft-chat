@@ -4,7 +4,7 @@ import datetime
 import logging
 import json
 
-from ulits import get_args, connent_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists
+from ulits import get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists
 
 
 async def chat_client(host, port, path):
@@ -17,7 +17,7 @@ async def chat_client(host, port, path):
 
 
 async def register_user(args):
-    async with connent_to_chat(args.host, args.port) as connection:
+    async with connect_to_chat(args.host, args.port) as connection:
         logging.info('Started auto registration')
         reader, writer = connection
         await reader.readline()
@@ -62,7 +62,7 @@ async def run_message_sender(args):
             await asyncio.sleep(0)
             continue
 
-        async with connent_to_chat(args.host, args.port) as connection:
+        async with connect_to_chat(args.host, args.port) as connection:
             logging.info('Open messenger connection')
             reader, writer = connection
             token = read_token_file()
