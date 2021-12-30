@@ -2,7 +2,8 @@ import asyncio
 import logging
 import json
 
-from ulits import get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists
+from ulits import (get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists,
+                   sanitize)
 
 
 async def register_user(args):
@@ -14,7 +15,7 @@ async def register_user(args):
         await writer.drain()
         await reader.readline()
         username = input('enter username: ')
-        writer.write(f'{username}\n'.encode())
+        writer.write(f'{sanitize(username)}\n'.encode())
         await writer.drain()
         response = await reader.readline()
         save_token(json.loads(response)['account_hash'])
@@ -22,13 +23,13 @@ async def register_user(args):
 
 
 async def send_message(writer, message):
-    writer.write(f'{message}\n\n'.encode())
+    writer.write(f'{sanitize(message)}\n\n'.encode())
     await writer.drain()
 
 
 async def is_authentic_token(reader, writer, token):
     logging.info('Checking token authenticity')
-    writer.write(f'{token}\n\n'.encode())
+    writer.write(f'{sanitize(token)}\n\n'.encode())
     await writer.drain()
     for _ in range(0, 2):
         results = await reader.readline()

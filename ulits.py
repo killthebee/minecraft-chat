@@ -51,3 +51,8 @@ async def connect_to_chat(host, port):
         yield reader, writer
     finally:
         writer.close()
+
+
+def sanitize(message):
+    return message.replace('\n', '').replace('\r', '')
+
