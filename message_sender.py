@@ -1,19 +1,8 @@
 import asyncio
-import aiofiles
-import datetime
 import logging
 import json
 
 from ulits import get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists
-
-
-async def chat_client(host, port, path):
-    reader, writer = await asyncio.open_connection(host, port)
-    while True:
-        data = await reader.read(100)
-        logging.info(data.decode())
-        async with aiofiles.open(path, 'a') as f:
-            await f.write(f"[{datetime.datetime.now().strftime('%d.%m.%y %H:%M')}] {data.decode()}")
 
 
 async def register_user(args):

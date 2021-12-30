@@ -7,12 +7,17 @@ from pathlib import Path
 
 
 def get_args():
+    """
+    default value is suitable only for message sender, thus won't work in message reader
+    file_path: might be either file with token for message sender or file with chat logs for reader
+    :return: arguments
+    """
     parser = argparse.ArgumentParser(description='program settings')
     parser.add_argument('--host', default='minechat.dvmn.org', help='chat ip')
     parser.add_argument('--port', default='5050', help='chat port')
-    parser.add_argument('--token_path', default='chat.txt', help='path to txt file')
+    parser.add_argument('--file_path', default='chat.txt', help='path to txt file')
     args = parser.parse_args()
-    os.environ["token_file_path"] = args.token_path
+    os.environ["token_file_path"] = args.file_path
     return args
 
 
