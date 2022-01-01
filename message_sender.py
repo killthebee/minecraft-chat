@@ -6,7 +6,7 @@ from utils import (get_args, connect_to_chat, save_token, read_token_file, delet
                    sanitize)
 
 
-async def register_user(host, port):
+async def register_user(host, port, path):
     async with connect_to_chat(host, port) as connection:
         logging.info('Started auto registration')
         reader, writer = connection
@@ -18,7 +18,7 @@ async def register_user(host, port):
         writer.write(f'{sanitize(username)}\n'.encode())
         await writer.drain()
         response = await reader.readline()
-        await save_token(json.loads(response)['account_hash'])
+        await save_token(json.loads(response)['account_hash'], path)
         logging.info('registered new user')
 
 
@@ -36,18 +36,18 @@ async def is_authentic_token(reader, writer, token):
     return not json.loads(results) is None
 
 
-async def input_token():
+async def input_token(path):
     token = input('please, input chat token: ')
     logging.info('Get token from user input')
-    await save_token(token)
+    await save_token(token, path)
     logging.info('Saved token file')
     return token
 
 
-async def run_message_sender(host, port):
+async def run_message_sender(host, port, path):
     while True:
         logging.info('Started message sender')
-        if not is_token_file_exists():
+        if not is_token_file_exists(path):
             logging.info('No token file were found')
             await asyncio.sleep(0)
             continue
@@ -55,11 +55,11 @@ async def run_message_sender(host, port):
         async with connect_to_chat(host, port) as connection:
             logging.info('Open messenger connection')
             reader, writer = connection
-            token = await read_token_file()
+            token = await read_token_file(path)
 
             if not await is_authentic_token(reader, writer, token):
                 logging.info('Provided token is not authenticated')
-                delete_token_file()
+                delete_token_file(path)
                 continue
             logging.info('Start messaging')
             while True:
@@ -67,24 +67,27 @@ async def run_message_sender(host, port):
                 await send_message(writer, message)
 
 
-async def run_token_handler(host, port):
+async def run_token_handler(host, port, path):
     token_never_manually_inputted = True
     while True:
-        if is_token_file_exists():
+        if is_token_file_exists(path):
             await asyncio.sleep(1)
             continue
         logging.info('Started handling token')
         if token_never_manually_inputted:
-            await input_token()
+            await input_token(path)
             await asyncio.sleep(0)
             token_never_manually_inputted = False
             continue
-        await register_user(host, port)
+        await register_user(host, port, path)
 
 
 async def main():
     args = get_args()
-    tasks = [run_message_sender(args.host, args.port), run_token_handler(args.host, args.port)]
+    tasks = [
+        run_message_sender(args.host, args.port, args.file_path),
+        run_token_handler(args.host, args.port, args.file_path)
+    ]
     await asyncio.wait(
         tasks,
         return_when=asyncio.ALL_COMPLETED

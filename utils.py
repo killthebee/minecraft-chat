@@ -18,31 +18,30 @@ def get_args():
     parser.add_argument('--port', default='5050', help='chat port')
     parser.add_argument('--file_path', default='chat.txt', help='path to txt file')
     args = parser.parse_args()
-    os.environ["token_file_path"] = args.file_path
     return args
 
 
-async def save_token(token):
-    async with aiofiles.open(f'{os.environ["token_file_path"]}', 'w') as f:
+async def save_token(token, path):
+    async with aiofiles.open(path, 'w') as f:
         await f.write(token)
 
 
-def is_token_file_exists():
-    token_file = Path(f'{os.environ["token_file_path"]}')
+def is_token_file_exists(path):
+    token_file = Path(path)
     return token_file.is_file()
 
 
-async def read_token_file():
-    if not is_token_file_exists():
+async def read_token_file(path):
+    if not is_token_file_exists(path):
         return None
-    async with aiofiles.open(f'{os.environ["token_file_path"]}') as token_file:
+    async with aiofiles.open(path) as token_file:
         return await token_file.read()
 
 
-def delete_token_file():
-    if not is_token_file_exists():
+def delete_token_file(path):
+    if not is_token_file_exists(path):
         return None
-    os.remove(f'{os.environ["token_file_path"]}')
+    os.remove(path)
 
 
 @asynccontextmanager
