@@ -3,11 +3,10 @@ import aiofiles
 import datetime
 import logging
 
-from ulits import get_args, connect_to_chat
+from utils import get_args, connect_to_chat
 
 
-async def chat_client(args):
-    host, port, path = args.host, args.port, args.file_path
+async def chat_client(host, port, path):
     logging.info('Reading chat')
 
     async with connect_to_chat(host, port) as connection:
@@ -25,4 +24,4 @@ async def chat_client(args):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     args = get_args()
-    asyncio.run(chat_client(args))
+    asyncio.run(chat_client(args.host, args.port, args.file_path))
