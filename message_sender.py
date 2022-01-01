@@ -67,8 +67,10 @@ async def run_message_sender(host, port, path):
                 await send_message(writer, message)
 
 
-async def run_token_handler(host, port, path):
+async def run_token_handler(host, port, path, token):
     token_never_manually_inputted = True
+    if token:
+        await save_token(token, path)
     while True:
         if is_token_file_exists(path):
             await asyncio.sleep(1)
@@ -86,7 +88,7 @@ async def main():
     args = get_args()
     tasks = [
         run_message_sender(args.host, args.port, args.file_path),
-        run_token_handler(args.host, args.port, args.file_path)
+        run_token_handler(args.host, args.port, args.file_path, args.token)
     ]
     await asyncio.wait(
         tasks,

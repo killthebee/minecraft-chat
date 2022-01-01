@@ -17,6 +17,7 @@ def get_args():
     parser.add_argument('--host', default='minechat.dvmn.org', help='chat ip')
     parser.add_argument('--port', default='5050', help='chat port')
     parser.add_argument('--file_path', default='chat.txt', help='path to txt file')
+    parser.add_argument('--token', default=None, help='token for authorization in message sending server')
     args = parser.parse_args()
     return args
 
