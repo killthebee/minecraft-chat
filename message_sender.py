@@ -2,7 +2,7 @@ import asyncio
 import logging
 import json
 
-from ulits import (get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists,
+from utils import (get_args, connect_to_chat, save_token, read_token_file, delete_token_file, is_token_file_exists,
                    sanitize)
 
 
@@ -18,7 +18,7 @@ async def register_user(args):
         writer.write(f'{sanitize(username)}\n'.encode())
         await writer.drain()
         response = await reader.readline()
-        save_token(json.loads(response)['account_hash'])
+        await save_token(json.loads(response)['account_hash'])
         logging.info('registered new user')
 
 
@@ -36,10 +36,10 @@ async def is_authentic_token(reader, writer, token):
     return not json.loads(results) is None
 
 
-def input_token():
+async def input_token():
     token = input('please, input chat token: ')
     logging.info('Get token from user input')
-    save_token(token)
+    await save_token(token)
     logging.info('Saved token file')
     return token
 
@@ -55,7 +55,7 @@ async def run_message_sender(args):
         async with connect_to_chat(args.host, args.port) as connection:
             logging.info('Open messenger connection')
             reader, writer = connection
-            token = read_token_file()
+            token = await read_token_file()
 
             if not await is_authentic_token(reader, writer, token):
                 logging.info('Provided token is not authenticated')
@@ -75,7 +75,7 @@ async def run_token_handler(args):
             continue
         logging.info('Started handling token')
         if token_never_manually_inputted:
-            input_token()
+            await input_token()
             await asyncio.sleep(0)
             token_never_manually_inputted = False
             continue

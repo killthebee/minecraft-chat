@@ -1,6 +1,7 @@
 import os
 import argparse
 import asyncio
+import aiofiles
 
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,9 +22,9 @@ def get_args():
     return args
 
 
-def save_token(token):
-    with open(f'{os.environ["token_file_path"]}', 'w') as f:
-        f.write(token)
+async def save_token(token):
+    async with aiofiles.open(f'{os.environ["token_file_path"]}', 'w') as f:
+        await f.write(token)
 
 
 def is_token_file_exists():
@@ -31,11 +32,11 @@ def is_token_file_exists():
     return token_file.is_file()
 
 
-def read_token_file():
+async def read_token_file():
     if not is_token_file_exists():
         return None
-    with open(f'{os.environ["token_file_path"]}') as token_file:
-        return token_file.read()
+    async with aiofiles.open(f'{os.environ["token_file_path"]}') as token_file:
+        return await token_file.read()
 
 
 def delete_token_file():
